@@ -219,6 +219,49 @@ details.settings summary{cursor:pointer;padding:12px 0;font-family:var(--display
 .gate .forgot{font-size:13px;font-weight:700;color:var(--muted);text-decoration:underline;align-self:center;padding:6px}
 .gate .msg{font-size:13px;font-weight:700;text-align:center;min-height:18px;color:var(--warn)}
 .gate .msg.ok{color:var(--mint-deep)}
+.tabs{display:flex;gap:8px;background:var(--card);padding:6px;border-radius:999px;box-shadow:0 3px 0 var(--line)}
+.tab{flex:1;padding:10px;font-weight:800;font-size:14px;color:var(--muted);--lip:transparent;box-shadow:none}
+.tab[aria-selected="true"]{background:var(--sky);color:#fff;--lip:var(--sky-deep);box-shadow:0 3px 0 var(--sky-deep)}
+#app[data-view="ts"] .calOnly{display:none}
+#app[data-view="cal"] .tsOnly{display:none}
+.calView{display:flex;flex-direction:column;gap:14px}
+.calCard{background:var(--card);border-radius:24px;padding:12px;box-shadow:0 3px 0 var(--line)}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;padding:0 0 6px}
+.calGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cell{position:relative;min-height:64px;border-radius:12px;background:var(--bg);padding:6px 4px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;border:2px solid transparent;overflow:hidden}
+.cell:disabled{opacity:.35;cursor:default}
+.cell .n{font-family:var(--display);font-weight:600;font-size:14px;line-height:1}
+.cell.blank{background:transparent}
+.cell.today .n{background:var(--sky);color:#fff;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;margin:-2px 0}
+.cell.sel{border-color:var(--ink)}
+.cell.MacArthur{background:var(--sun-soft)} .cell.Crandall{background:var(--pink-soft)}
+.cell.offday{background:repeating-linear-gradient(-45deg,#FFE9E2 0 6px,#FFF4F0 6px 12px)}
+.cell .ev{font-size:9.5px;font-weight:800;line-height:1.15;max-width:100%;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;color:var(--ink);opacity:.85}
+.cell .hrs{font-size:10px;font-weight:800;color:var(--sky-deep);margin-top:auto}
+.cell .chg{position:absolute;top:4px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--ink);opacity:.5}
+.cell .nt{position:absolute;bottom:4px;right:5px;font-size:9px;color:var(--mint-deep)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;padding:10px 4px 2px;font-size:11px;font-weight:700;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.sw{width:12px;height:12px;border-radius:4px;display:inline-block}
+.sw.MacArthur{background:var(--sun)} .sw.Crandall{background:var(--pink)} .sw.off{background:repeating-linear-gradient(-45deg,#F5B9A6 0 3px,#FFF4F0 3px 6px)}
+.dpanel{background:var(--card);border-radius:24px;padding:16px;box-shadow:0 3px 0 var(--line);display:flex;flex-direction:column;gap:12px}
+.dpanel h3{margin:0;font-family:var(--display);font-weight:600;font-size:18px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.dpanel h3 small{font-family:var(--body);font-size:12px;font-weight:700;color:var(--muted)}
+.dpanel .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.dpanel .lab{font-size:12px;font-weight:800;color:var(--muted);width:100%}
+.dpanel .opt{padding:7px 12px;font-size:13px;font-weight:800;--lip:var(--line);background:var(--bg)}
+.dpanel .opt.MacArthur{background:var(--sun);color:var(--sun-ink);--lip:var(--sun-deep)}
+.dpanel .opt.Crandall{background:var(--pink);color:#fff;--lip:var(--pink-deep)}
+.dpanel .opt.cur{outline:3px solid var(--ink);outline-offset:1px}
+.dpanel .ev{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:16px;background:var(--bg);font-weight:700;font-size:14px}
+.dpanel .ev .t{flex:1;min-width:0}
+.dpanel .ev .d{font-size:12px;color:var(--muted);font-weight:600;display:block}
+.dpanel .ev .kpill{margin:0}
+.dpanel .rm{font-size:12px;font-weight:700;color:var(--muted);text-decoration:underline;padding:4px}
+.dpanel .noteq{font-size:13px;font-weight:600;color:var(--muted);background:var(--bg);border-radius:14px;padding:9px 12px}
+.dpanel .hint{font-size:13px;font-weight:700;color:var(--muted)}
+.dpanel .evForm{margin-top:2px}
+@media (max-width:400px){.cell{min-height:58px}.cell .ev{font-size:9px}}
 .signout{font-size:12px;font-weight:700;color:var(--muted);text-decoration:underline;padding:4px 6px}
 .hdrR{display:flex;align-items:center;gap:6px}
 </style>
@@ -241,13 +284,32 @@ details.settings summary{cursor:pointer;padding:12px 0;font-family:var(--display
     <div class="hdrR"><div class="status" id="status">Loading…</div><button class="signout" id="signOut" type="button">Sign out</button></div>
   </header>
 
-  <div class="period">
+  <div class="tabs" role="tablist" aria-label="View">
+    <button class="tab bub" id="tabTs" role="tab" type="button">Timesheet</button>
+    <button class="tab bub" id="tabCal" role="tab" type="button">Calendar</button>
+  </div>
+
+  <section class="calView calOnly" id="calView" aria-label="Calendar">
+    <div class="period">
+      <button class="arrow bub" id="calPrev" aria-label="Previous month">‹</button>
+      <h1 id="calTitle">&nbsp;</h1>
+      <button class="arrow bub" id="calNext" aria-label="Next month">›</button>
+    </div>
+    <div class="calCard">
+      <div class="dow"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+      <div class="calGrid" id="calGrid"></div>
+      <div class="legend"><span><i class="sw MacArthur"></i>MacArthur house</span><span><i class="sw Crandall"></i>Crandall house</span><span><i class="sw off"></i>No care</span></div>
+    </div>
+    <div id="dayPanel"></div>
+  </section>
+
+  <div class="period tsOnly">
     <button class="arrow bub" id="prev" aria-label="Previous pay period">‹</button>
     <h1 id="ptitle">&nbsp;<span class="sub">&nbsp;</span></h1>
     <button class="arrow bub" id="next" aria-label="Next pay period">›</button>
   </div>
 
-  <section class="hero" aria-label="Pay period summary">
+  <section class="hero tsOnly" aria-label="Pay period summary">
     <div class="total">
       <div>
         <div class="lbl" id="payLbl">Owed this period</div>
@@ -259,7 +321,7 @@ details.settings summary{cursor:pointer;padding:12px 0;font-family:var(--display
     <div class="actions" id="actions"></div>
   </section>
 
-  <div class="fams">
+  <div class="fams tsOnly">
     <div class="fam a"><span class="who" id="famAName">Elowyn</span><span class="owe num" id="famAOwe">$0</span><span class="h num" id="famAHrs">0h</span><div class="famPay" id="famAPay"></div></div>
     <div class="fam b"><span class="who" id="famBName">Ingrid</span><span class="owe num" id="famBOwe">$0</span><span class="h num" id="famBHrs">0h</span><div class="famPay" id="famBPay"></div></div>
   </div>
@@ -282,9 +344,9 @@ details.settings summary{cursor:pointer;padding:12px 0;font-family:var(--display
   </section>
 
   <div id="banner" class="banner" hidden></div>
-  <div id="weeks"></div>
+  <div id="weeks" class="tsOnly"></div>
 
-  <details class="settings">
+  <details class="settings tsOnly">
     <summary>Settings: rates, names &amp; house rotation</summary>
     <div class="grid">
       <label>Rate, both kids ($/hr)<input id="rateBoth" type="number" inputmode="decimal" step="0.5" min="0"></label>
@@ -397,7 +459,10 @@ function render(){
   const cp=document.createElement("button");cp.className="btn ghost bub";cp.textContent="Copy summary";cp.onclick=()=>copySummary(range,T);act.append(cp);
   const toast=document.createElement("span");toast.className="toast";toast.id="toast";act.append(toast);
 
-  renderUpcoming();renderRot();
+  $("app").dataset.view=view;
+  $("tabTs").setAttribute("aria-selected",view==="ts");$("tabCal").setAttribute("aria-selected",view==="cal");
+  parkEvForm();
+  renderUpcoming();renderRot();if(view==="cal")renderCal();else placeEvForm();
   const ae=document.activeElement,keep=ae&&ae.id&&(ae.id.startsWith("n-")||ae.id.startsWith("x-"))?{id:ae.id,s:ae.selectionStart,e:ae.selectionEnd}:null;
   const W=$("weeks");W.innerHTML="";
   for(let w=0;w<2;w++){
@@ -618,8 +683,104 @@ function removeEvent(dates){
   for(const k of dates){const s={...(state.sched[k]||{})};delete s.title;delete s.kind;delete s.detail;writeSched(k,s);}
   render();
 }
-$("addEv").onclick=()=>{const f=$("evForm");f.hidden=!f.hidden;if(!f.hidden){$("evFrom").value=key(todayUTC());$("evTo").value="";$("evTitle").value="";$("evKindOff").checked=true;$("evFrom").focus();}};
-$("evCancel").onclick=()=>{$("evForm").hidden=true};
+let evHost="up"; // where the time-off form lives: the upcoming list, or the calendar's day panel
+function openEvForm(host,fromK){
+  const f=$("evForm");evHost=host;f.hidden=false;
+  $("evFrom").value=fromK||key(todayUTC());$("evTo").value="";$("evTitle").value="";$("evKindOff").checked=true;
+  placeEvForm();(fromK?$("evTitle"):$("evFrom")).focus();
+}
+function parkEvForm(){ // keep the form safe in the upcoming section before any panel is rebuilt
+  const f=$("evForm"),up=document.querySelector(".upcoming");if(f&&f.parentNode!==up)up.insertBefore(f,$("upList"));
+}
+function placeEvForm(){
+  const f=$("evForm");
+  const host=evHost==="cal"&&view==="cal"?document.getElementById("evSlot"):null;
+  if(host){if(f.parentNode!==host)host.append(f);}
+  else{const up=document.querySelector(".upcoming");if(f.parentNode!==up)up.insertBefore(f,$("upList"));if(evHost==="cal")f.hidden=true;}
+}
+$("addEv").onclick=()=>{if(!$("evForm").hidden&&evHost==="up"){$("evForm").hidden=true;return;}openEvForm("up");};
+$("evCancel").onclick=()=>{$("evForm").hidden=true;if(evHost==="cal")render();};
+
+/* ---------- calendar view ---------- */
+let view=location.hash==="#calendar"?"cal":"ts";
+let calMonth=(()=>{const d=new Date(todayUTC());return Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),1)})();
+let calSel=null;
+function setView(v){view=v;if(v==="cal"){history.replaceState(null,"","#calendar");}else{history.replaceState(null,"",location.pathname+location.search);}render();window.scrollTo({top:0});}
+$("tabTs").onclick=()=>setView("ts");$("tabCal").onclick=()=>setView("cal");
+window.addEventListener("hashchange",()=>{const v=location.hash==="#calendar"?"cal":"ts";if(v!==view){view=v;render();}});
+function shiftMonth(n){const d=new Date(calMonth);calMonth=Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+n,1);render();}
+$("calPrev").onclick=()=>shiftMonth(-1);$("calNext").onclick=()=>shiftMonth(1);
+function runAround(k){ // the consecutive dates sharing this day's time-off entry
+  const s=state.sched[k];if(!s||!s.title)return [k];
+  const same=x=>{const y=state.sched[x];return y&&y.title===s.title&&y.kind===s.kind};
+  const out=[k];let t=Date.parse(k+"T00:00:00Z");
+  for(let a=t-DAY;same(key(a));a-=DAY)out.unshift(key(a));
+  for(let b=t+DAY;same(key(b));b+=DAY)out.push(key(b));
+  return out;
+}
+function renderCal(){
+  const c=state.cfg,t=todayUTC(),m0=new Date(calMonth),y=m0.getUTCFullYear(),mo=m0.getUTCMonth();
+  $("calTitle").textContent=fmtD(calMonth,{month:"long",year:"numeric"});
+  const first=new Date(calMonth).getUTCDay(),days=new Date(Date.UTC(y,mo+1,0)).getUTCDate();
+  const g=$("calGrid");g.innerHTML="";
+  for(let i=0;i<first;i++){const b=document.createElement("div");b.className="cell blank";g.append(b);}
+  for(let dnum=1;dnum<=days;dnum++){
+    const tt=Date.UTC(y,mo,dnum),k=key(tt),d=dayData(k),sc=state.sched[k]||{},hs=houseInfo(k);
+    const b=document.createElement("button");b.type="button";
+    b.className="cell"+(tt===t?" today":"")+(calSel===k?" sel":"")+(hs.house?" "+hs.house:"")+(sc.kind==="off"?" offday":"");
+    b.setAttribute("aria-label",fmtD(tt,{weekday:"long",month:"long",day:"numeric"})+(hs.house?", "+hs.house+" house":"")+(sc.title?", "+sc.title:"")+(d.hours?", "+hLong(d.hours):""));
+    const n=document.createElement("span");n.className="n";n.textContent=dnum;b.append(n);
+    if(sc.title){const e=document.createElement("span");e.className="ev";e.textContent=sc.title;b.append(e);}
+    if(d.hours){const h=document.createElement("span");h.className="hrs num";h.textContent=hm(d.hours);b.append(h);}
+    if(hs.override){const o=document.createElement("i");o.className="chg";o.title="House changed for this day";b.append(o);}
+    if(d.note.trim()){const o=document.createElement("span");o.className="nt";o.textContent="✎";b.append(o);}
+    b.onclick=()=>{calSel=calSel===k?null:k;if($("evForm")&&evHost==="cal")$("evForm").hidden=true;render();};
+    g.append(b);
+  }
+  renderDayPanel();
+}
+function renderDayPanel(){
+  const P=$("dayPanel");P.innerHTML="";
+  if(!calSel){P.innerHTML='<div class="dpanel"><span class="hint">Tap a day to see details, change the house, or add time off.</span></div>';return;}
+  const k=calSel,tt=Date.parse(k+"T00:00:00Z"),c=state.cfg,d=dayData(k),sc=state.sched[k]||{},hs=houseInfo(k);
+  const box=document.createElement("div");box.className="dpanel";
+  const mk=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;};
+  const h=mk("h3",null,fmtD(tt,{weekday:"long",month:"long",day:"numeric"}));
+  if(d.hours){const sm=mk("small","num",hLong(d.hours)+" · "+[d.a&&c.kidA,d.b&&c.kidB].filter(Boolean).join(" & "));h.append(sm);}
+  box.append(h);
+
+  // house
+  const hr=mk("div","row");hr.append(mk("span","lab","House"));
+  const cur=hs.house;
+  const pick=v=>{const s={...(state.sched[k]||{})};if(v===undefined)delete s.house;else s.house=v;writeSched(k,s);render();};
+  HOUSES.forEach(H=>{const b=mk("button","opt bub "+H+(cur===H?" cur":""),H);b.type="button";b.disabled=!state.canWrite;b.onclick=()=>pick(H===hs.ruleHouse&&sc.kind!=="off"?undefined:H);hr.append(b);});
+  const nb=mk("button","opt bub"+(!cur?" cur":""),"No house");nb.type="button";nb.disabled=!state.canWrite;nb.onclick=()=>pick(hs.ruleHouse&&sc.kind!=="off"?"none":undefined);hr.append(nb);
+  if(hs.override){const u=mk("button","rm","Back to rotation");u.type="button";u.onclick=()=>pick(undefined);hr.append(u);}
+  box.append(hr);
+
+  // time off
+  const er=mk("div","row");er.append(mk("span","lab","Time off & notes"));
+  if(sc.title){
+    const run=runAround(k),a=Date.parse(run[0]+"T00:00:00Z"),b2=Date.parse(run[run.length-1]+"T00:00:00Z");
+    const ev=mk("div","ev");const p=mk("span","kpill k-"+(KINDS[sc.kind]?sc.kind:"info"),KINDS[sc.kind]||"Heads-up");
+    const tx=mk("span","t",sc.title);
+    const when=run.length>1?fmtD(a,{month:"short",day:"numeric"})+" – "+fmtD(b2,{month:"short",day:"numeric"}):"";
+    if(when||sc.detail){const dd=mk("span","d",[when,sc.detail].filter(Boolean).join(" · "));tx.append(dd);}
+    ev.append(p,tx);
+    if(state.canWrite){const r=mk("button","rm","Remove");r.type="button";r.onclick=()=>removeEvent(run);ev.append(r);}
+    ev.style.width="100%";er.append(ev);
+  }
+  if(state.canWrite){const add=mk("button","addBtn bub","+ Add time off from this day");add.type="button";add.onclick=()=>openEvForm("cal",k);er.append(add);}
+  box.append(er);
+  const slot=mk("div");slot.id="evSlot";slot.style.width="100%";box.append(slot);
+  if(d.note.trim())box.append(mk("div","noteq","✎ "+d.note.trim()));
+
+  const go=mk("button","rm","Open this day in the timesheet");go.type="button";
+  go.onclick=()=>{state.idx=idxFor(tt);setView("ts");setTimeout(()=>{const el=document.getElementById("h-"+k);if(el)el.closest(".day").scrollIntoView({behavior:"smooth",block:"center"});},50);};
+  box.append(go);
+  P.append(box);
+  placeEvForm();
+}
 $("evForm").addEventListener("submit",e=>{
   e.preventDefault();
   const a=Date.parse($("evFrom").value+"T00:00:00Z");let b=$("evTo").value?Date.parse($("evTo").value+"T00:00:00Z"):a;
