@@ -84,7 +84,10 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .week h2 small{font-family:var(--body);font-size:12px;font-weight:700;color:var(--muted)}
 .day{background:var(--card);border-radius:22px;padding:12px 14px;box-shadow:0 3px 0 var(--line);
   display:grid;grid-template-columns:56px auto 1fr;align-items:center;gap:10px 12px}
-.day.off{background:rgba(255,255,255,.55);box-shadow:none;border:2px dashed var(--line)}
+.day.off{background:rgba(255,255,255,.45);box-shadow:none;border:2px dashed var(--line)}
+.day.off .date .dn,.day.off .date .dd{color:var(--muted)}
+.day.off .step,.day.off .chip,.day.off .noteBtn{opacity:.55}
+.day.off.today .date .dd{color:var(--sky-deep)}
 .day.today{box-shadow:0 0 0 3px var(--sky),0 3px 0 3px var(--sky-deep)}
 .date .dn{font-family:var(--display);font-weight:600;font-size:17px;line-height:1.1}
 .date .dd{font-size:12px;font-weight:700;color:var(--muted)}
@@ -479,7 +482,8 @@ function dayRow(t,isToday,weekend){
   const k=key(t),d=dayData(k),c=state.cfg,co=cost(d);
   const row=document.createElement("div");
   const sc=state.sched[k]||{};
-  row.className="day"+(isToday?" today":"")+(d.hours?"":" zero")+(sc.kind==="off"&&!d.hours?" nocare":weekend&&!d.hours?" off":"");
+  const scheduled=!!houseInfo(k).house||sc.kind==="short"||sc.kind==="optional";
+  row.className="day"+(isToday?" today":"")+(d.hours?"":" zero")+(sc.kind==="off"&&!d.hours?" nocare":!scheduled&&!d.hours?" off":"");
   const date=document.createElement("div");date.className="date";
   date.innerHTML='<div class="dn"></div><div class="dd"></div>';
   date.firstChild.textContent=fmtD(t,{weekday:"short"});
