@@ -20,10 +20,12 @@ pre{background:#EFF4FB;border-radius:14px;padding:12px;font-size:12px;overflow:a
 <body>
 <div class="card">
   <h1>Import the old timesheet</h1>
-  <p>One-time step. This copies the hours, time off and settings from the Claude version into the new database. Sign in with your account, then tap Import. Running it twice is harmless; it just rewrites the same entries.</p>
+  <p><b>Import:</b> one-time step. This copies the hours, time off and settings from the Claude version into the new database. Sign in with your account, then tap Import. Running it twice is harmless; it just rewrites the same entries.</p>
+  <p><b>Holidays:</b> adds the unpaid holidays from the nanny share agreement (Thanksgiving and the day after, Christmas Eve and Day, the week between Christmas and New Year’s, New Year’s Day, Memorial Day, Fourth of July, Labor Day) as no-care days through 2027. Also safe to repeat.</p>
   <input id="em" type="email" placeholder="Email" autocomplete="username">
   <input id="pw" type="password" placeholder="Password" autocomplete="current-password">
   <button id="go">Sign in and import</button>
+  <button id="hol">Add agreement holidays (through 2027)</button>
   <div id="msg"></div>
   <pre id="log" hidden></pre>
 </div>
@@ -47,7 +49,37 @@ const SEED={
   "schedule/2026-12-30":{"kind":"off","title":"Holiday Break"},
   "schedule/2026-12-31":{"kind":"off","title":"Holiday Break"}
 };
+const HOLIDAYS={
+"2026-11-27": "Day after Thanksgiving",
+"2026-12-25": "Christmas Day",
+"2026-12-28": "Holiday Break",
+"2027-01-01": "New Year’s Day",
+"2027-05-31": "Memorial Day",
+"2027-07-04": "Fourth of July",
+"2027-09-06": "Labor Day",
+"2027-11-25": "Thanksgiving",
+"2027-11-26": "Day after Thanksgiving",
+"2027-12-24": "Christmas Eve",
+"2027-12-25": "Christmas Day",
+"2027-12-27": "Holiday Break",
+"2027-12-28": "Holiday Break",
+"2027-12-29": "Holiday Break",
+"2027-12-30": "Holiday Break",
+"2027-12-31": "Holiday Break",
+"2028-01-01": "New Year’s Day"
+};
 const $=id=>document.getElementById(id);
+$("hol").onclick=async()=>{
+  const msg=$("msg"),log=$("log");msg.textContent="";msg.className="";$("hol").disabled=true;
+  try{
+    await firebase.auth().signInWithEmailAndPassword($("em").value.trim(),$("pw").value);
+    const db=firebase.firestore(),batch=db.batch();
+    for(const [d,title] of Object.entries(HOLIDAYS))batch.set(db.doc("schedule/"+d),{title,kind:"off"},{merge:true});
+    await batch.commit();
+    log.hidden=false;log.textContent=Object.entries(HOLIDAYS).map(([d,t])=>d+"  "+t).join("\n");
+    msg.textContent="Done. "+Object.keys(HOLIDAYS).length+" holidays added as no-care days.";msg.className="ok";
+  }catch(e){msg.textContent="Didn’t work: "+(e.message||e.code||e);msg.className="bad";$("hol").disabled=false;}
+};
 $("go").onclick=async()=>{
   const msg=$("msg"),log=$("log");msg.textContent="";msg.className="";$("go").disabled=true;
   try{
