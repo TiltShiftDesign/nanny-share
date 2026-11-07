@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nanny Share · Import</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Nunito:wght@600;700;800&display=swap">
+<style>
+body{margin:0;background:#EFF4FB;color:#1F2340;font:600 15px/1.5 "Nunito",system-ui,sans-serif;padding:24px 16px}
+.card{max-width:460px;margin:0 auto;background:#fff;border-radius:24px;padding:22px;box-shadow:0 6px 0 #DCE3F0;display:flex;flex-direction:column;gap:12px}
+h1{font:600 24px "Fredoka",system-ui,sans-serif;margin:0}
+p{margin:0;color:#6E7493}
+input{font:inherit;padding:11px 12px;border:2px solid #DCE3F0;border-radius:14px;width:100%;box-sizing:border-box}
+button{font:800 15px "Nunito",system-ui,sans-serif;padding:13px;border:0;border-radius:999px;background:#3E8EF7;color:#fff;box-shadow:0 4px 0 #2468C9;cursor:pointer}
+button:disabled{opacity:.5;cursor:default}
+pre{background:#EFF4FB;border-radius:14px;padding:12px;font-size:12px;overflow:auto;max-height:200px;margin:0}
+.ok{color:#23A26C}.bad{color:#E5603A}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Import the old timesheet</h1>
+  <p>One-time step. This copies the hours, time off and settings from the Claude version into the new database. Sign in with your account, then tap Import. Running it twice is harmless; it just rewrites the same entries.</p>
+  <input id="em" type="email" placeholder="Email" autocomplete="username">
+  <input id="pw" type="password" placeholder="Password" autocomplete="current-password">
+  <button id="go">Sign in and import</button>
+  <div id="msg"></div>
+  <pre id="log" hidden></pre>
+</div>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({apiKey:"AIzaSyA8kPit0yUP_8emv3Jtmuak-9-kew5rhTg",authDomain:"nanny-share-42170.firebaseapp.com",projectId:"nanny-share-42170",storageBucket:"nanny-share-42170.firebasestorage.app",messagingSenderId:"1007920516764",appId:"1:1007920516764:web:3d18f19cdb5aeccf542759"});
+const SEED={
+  "config/main":{"kidA":"Elowyn","kidB":"Ingrid","nanny":"Angela","rateBoth":32,"rateOne":24,"mileRate":0.76,"rot":{"anchor":"2026-11-08","days":[2,3,4],"house":"MacArthur"}},
+  "days/2026-11-02":{"a":true,"b":true,"hours":3,"note":"","exp":[]},
+  "days/2026-11-03":{"a":true,"b":true,"hours":7.75,"note":"","exp":[]},
+  "days/2026-11-04":{"a":true,"b":true,"hours":8,"note":"","exp":[]},
+  "days/2026-11-05":{"a":true,"b":true,"hours":8,"note":"","exp":[]},
+  "schedule/2026-11-12":{"kind":"short","title":"Angela 8:30–12:00 only"},
+  "schedule/2026-11-23":{"detail":"To make up for 11/25 day off. Ingrid is opting out.","kind":"optional","title":"Optional care day"},
+  "schedule/2026-11-25":{"kind":"off","title":"No care"},
+  "schedule/2026-11-26":{"kind":"off","title":"Thanksgiving"},
+  "schedule/2026-12-24":{"kind":"off","title":"Christmas Eve"},
+  "schedule/2026-12-29":{"kind":"off","title":"Holiday Break"},
+  "schedule/2026-12-30":{"kind":"off","title":"Holiday Break"},
+  "schedule/2026-12-31":{"kind":"off","title":"Holiday Break"}
+};
+const $=id=>document.getElementById(id);
+$("go").onclick=async()=>{
+  const msg=$("msg"),log=$("log");msg.textContent="";msg.className="";$("go").disabled=true;
+  try{
+    await firebase.auth().signInWithEmailAndPassword($("em").value.trim(),$("pw").value);
+    const db=firebase.firestore(),batch=db.batch();
+    for(const [p,v] of Object.entries(SEED))batch.set(db.doc(p),v);
+    await batch.commit();
+    log.hidden=false;log.textContent=Object.keys(SEED).join("\n");
+    msg.textContent="Done. "+Object.keys(SEED).length+" entries written. You can close this page and open the timesheet.";msg.className="ok";
+  }catch(e){msg.textContent="Didn’t work: "+(e.message||e.code||e);msg.className="bad";$("go").disabled=false;}
+};
+</script>
+</body>
+</html>

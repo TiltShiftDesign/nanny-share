@@ -1,0 +1,10 @@
+{
+  "name": "Nanny Share Hours",
+  "short_name": "Nanny Share",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#EFF4FB",
+  "theme_color": "#3E8EF7",
+  "icons": [{ "src": "icon.png", "sizes": "512x512", "type": "image/png" }]
+}
