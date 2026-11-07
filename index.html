@@ -459,8 +459,6 @@ function render(){
       const m=document.createElement("button");m.className="payBtn bub";m.textContent="Mark as paid";m.onclick=()=>setPaid(f,true);box.append(m);
     }
   });
-  const cp=document.createElement("button");cp.className="btn ghost bub";cp.textContent="Copy summary";cp.onclick=()=>copySummary(range,T);act.append(cp);
-  const toast=document.createElement("span");toast.className="toast";toast.id="toast";act.append(toast);
 
   $("app").dataset.view=view;
   $("tabTs").setAttribute("aria-selected",view==="ts");$("tabCal").setAttribute("aria-selected",view==="cal");
@@ -853,13 +851,6 @@ let flashT;
 function flash(msg,bad){const t=$("status");t.textContent=msg;t.style.color=bad?"var(--warn)":"";clearTimeout(flashT);if(!bad)flashT=setTimeout(()=>{t.textContent="Synced";t.style.color=""},1500);}
 function showBanner(m){const b=$("banner");b.textContent=m;b.hidden=false}
 
-function copySummary(range,T){
-  const c=state.cfg;
-  const txt=`Nanny share · ${range}\n${c.nanny}: ${hLong(T.h)} · ${money(T.pay)}${T.exp?` (includes ${money(T.exp)} reimbursements)`:""}\n${c.kidA}’s family: ${money(T.pa)} (${hLong(T.ha)})\n${c.kidB}’s family: ${money(T.pb)} (${hLong(T.hb)})`;
-  const done=()=>{const el=$("toast");if(el)el.textContent="Copied";};
-  try{navigator.clipboard.writeText(txt).then(done,()=>fallback(txt))}catch(e){fallback(txt)}
-}
-function fallback(txt){const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";document.body.append(ta);ta.select();try{document.execCommand("copy");const el=$("toast");if(el)el.textContent="Copied";}catch(e){}ta.remove();}
 
 $("prev").onclick=()=>{if(state.idx>0){state.idx--;render()}};
 $("next").onclick=()=>{state.idx++;render()};
